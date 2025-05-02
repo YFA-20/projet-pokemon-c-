@@ -3,6 +3,8 @@
 
 Type::Type(const std::string& nom) : nom_(nom) {}
 
+const std::string& Type::getNom() const { return nom_; }
+
 void Type::addFaiblesse(Type* t) { faiblesses_.push_back(t); }
 void Type::addResistance(Type* t) { resistances_.push_back(t); }
 
@@ -13,6 +15,4 @@ double Type::multiplicateurContre(Type* cible) const {
     return 0.5;
   return 1.0;
 }
-
-const std::string& Type::getNom() const { return nom_; }
 

@@ -4,14 +4,15 @@
 
 class Type {
 public:
-  Type(const std::string& nom);
+  explicit Type(const std::string& nom);
+
+  const std::string& getNom() const;
   void addFaiblesse(Type* t);
   void addResistance(Type* t);
   double multiplicateurContre(Type* cible) const;
-  const std::string& getNom() const;
 
 private:
-  std::string nom_;
+  std::string        nom_;
   std::vector<Type*> faiblesses_;
   std::vector<Type*> resistances_;
 };
