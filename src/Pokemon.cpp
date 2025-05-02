@@ -8,25 +8,24 @@ Pokemon::Pokemon(const std::string& nom,
                  const std::vector<Attack*>& attaques)
   : nom_(nom), pv_(pv), types_(types), attaques_(attaques)
 {
-  // On suppose que types.size() est 1 ou 2, attaques.size() entre 1 et 4
+  // On suppose que types_.size() est 1 ou 2, attaques_.size() entre 1 et 4
 }
 
 void Pokemon::attaquer(Pokemon& cible) {
-  // On prend la première attaque de la liste
+  // Prendre la première attaque
   Attack* atk = attaques_.front();
 
-  // Calcul du multiplicateur selon tous les types de la cible
+  // Calculer le multiplicateur pour chaque type de la cible
   double mult = 1.0;
   for (Type* t : cible.types_) {
     mult *= atk->getType()->multiplicateurContre(t);
   }
 
-  // Dégâts effectifs
   int degats = static_cast<int>(atk->getPuissance() * mult);
-
   std::cout << nom_ << " utilise " << atk->getNom()
-            << " et inflige " << degats << " dégâts sur "
-            << cible.getNom() << ".\n";
+            << " et inflige " << degats
+            << " dégâts sur " << cible.getNom() << ".\n";
+
   cible.recevoirDegats(degats);
 }
 
@@ -39,6 +38,19 @@ bool Pokemon::estKO() const {
   return pv_ <= 0;
 }
 
-const std::string& Pokemon::getNom() const { return nom_; }
-int Pokemon::getPV() const            { return pv_; }
+const std::string& Pokemon::getNom() const {
+  return nom_;
+}
+
+int Pokemon::getPV() const {
+  return pv_;
+}
+
+size_t Pokemon::getNbAttaques() const {
+  return attaques_.size();
+}
+
+Attack* Pokemon::getAttaque(size_t index) const {
+  return attaques_.at(index);
+}
 
