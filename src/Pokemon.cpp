@@ -2,13 +2,32 @@
 #include <iostream>
 #include <algorithm>
 
-Pokemon::Pokemon(const std::string& nom, int pv, int degats)
-  : nom_(nom), pv_(pv), degats_(degats) {}
+Pokemon::Pokemon(const std::string& nom,
+                 int pv,
+                 const std::vector<Type*>& types,
+                 const std::vector<Attack*>& attaques)
+  : nom_(nom), pv_(pv), types_(types), attaques_(attaques)
+{
+  // On suppose que types.size() est 1 ou 2, attaques.size() entre 1 et 4
+}
 
 void Pokemon::attaquer(Pokemon& cible) {
-  std::cout << nom_ << " attaque " << cible.getNom()
-            << " et inflige " << degats_ << " dégâts.\n";
-  cible.recevoirDegats(degats_);
+  // On prend la première attaque de la liste
+  Attack* atk = attaques_.front();
+
+  // Calcul du multiplicateur selon tous les types de la cible
+  double mult = 1.0;
+  for (Type* t : cible.types_) {
+    mult *= atk->getType()->multiplicateurContre(t);
+  }
+
+  // Dégâts effectifs
+  int degats = static_cast<int>(atk->getPuissance() * mult);
+
+  std::cout << nom_ << " utilise " << atk->getNom()
+            << " et inflige " << degats << " dégâts sur "
+            << cible.getNom() << ".\n";
+  cible.recevoirDegats(degats);
 }
 
 void Pokemon::recevoirDegats(int montant) {
