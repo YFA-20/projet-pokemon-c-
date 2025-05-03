@@ -7,7 +7,7 @@ OBJ_APP   := $(SRC_APP:.cpp=.o)
 TARGET    := pokemon-simulator
 
 # Tests unitaires
-SRC_TEST  := tests/Pokemon.test.cpp src/Pokemon.cpp
+SRC_TEST  := tests/Pokemon.test.cpp src/Pokemon.cpp src/Attack.cpp src/Type.cpp
 TEST_BIN  := runTests
 
 .PHONY: all test clean
@@ -18,8 +18,8 @@ $(TARGET): $(OBJ_APP)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 # Génération de l'exécutable de tests
-$(TEST_BIN): $(SRC_TEST) tests/catch.hpp
-	$(CXX) $(CXXFLAGS) -I./tests $^ -o $@
+$(TEST_BIN): tests/catch.hpp $(SRC_TEST)
+	$(CXX) $(CXXFLAGS) -I./tests $(SRC_TEST) -o $@
 
 # Lancer les tests
 test: $(TEST_BIN)
