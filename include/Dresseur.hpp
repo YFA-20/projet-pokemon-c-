@@ -1,31 +1,42 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include "Pokemon.hpp"
 #include "Interagir.hpp"
 
-/// Un dresseur a un nom, une équipe de 1..6 Pokémon et un Pokémon actif
+/// Un dresseur possède un nom, une équipe de Pokémons et choisit des actions.
 class Dresseur : public Interagir {
 public:
-  Dresseur(const std::string& nom,
-           const std::vector<Pokemon*>& equipe);
+    /// Constructeur
+    /// @param nom    : nom du dresseur
+    /// @param equipe : liste de 1..6 Pokémons
+    Dresseur(const std::string& nom,
+             const std::vector<Pokemon*>& equipe);
 
-  // Accesseurs
-  const std::string& getNom() const;
+    /// @return le nom du dresseur
+    const std::string& getNom() const;
 
-  // Implémente Interagir
-  Action choisirAction() override;
+    /// @return le Pokémon actif
+    Pokemon* getActif() const;
 
-  // Permet de switcher manuellement (appelé par un menu ultérieurement)
-  void changerPokemon(int idx);
+    /// @return l’index de p dans l’équipe, ou -1 si non trouvé
+    int indexActif(Pokemon* p) const;
 
-  bool aPokemonDisponible() const;
+    /// @return true s’il reste au moins un Pokémon non KO
+    bool aPokemonDisponible() const;
+
+    /// Change le Pokémon actif vers l’index idx (0..size-1)
+    void changerPokemon(int idx);
+
+    /// Choisit une action : attaque si possible, sinon switch
+    Action choisirAction() override;
 
 protected:
-  std::vector<Pokemon*> equipe_;  // 1..6
-  Pokemon*              actif_;   // toujours un des membres de equipe_
+    std::vector<Pokemon*> equipe_;  // 1..6
+    Pokemon*              actif_;   // toujours un des membres de equipe_
 
 private:
-  std::string nom_;
+    std::string nom_;
 };
 
