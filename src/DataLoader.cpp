@@ -1,151 +1,140 @@
 #include "DataLoader.hpp"
-
-#include "Type.hpp"
-#include "Attack.hpp"
 #include "Pokemon.hpp"
+#include "Attack.hpp"
+#include "Type.hpp"
 #include "Joueur.hpp"
 #include "LeaderGym.hpp"
 #include "MaitrePokemon.hpp"
 
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 using namespace std;
 
-map<string, Type*> DataLoader::loadTypes(const string& filename) {
-    map<string, Type*> types;
-    ifstream in(filename);
-    string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
-        types[line] = new Type(line);
+map<string,Pokemon*> DataLoader::loadPokemons(const string& filename) {
+    map<string,Pokemon*> pokedex;
+    map<string,Type*>    types;
+    map<string,Attack*>  attacks;
+
+    ifstream file(filename);
+    if (!file) {
+        cerr << "Erreur: impossible d'ouvrir " << filename << "\n";
+        return {};
     }
-    return types;
-}
 
-map<string, Attack*> DataLoader::loadAttacks(const string& filename,
-                                             const map<string, Type*>& types) {
-    map<string, Attack*> attacks;
-    ifstream in(filename);
     string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
+    getline(file, line); // skip header
+    while (getline(file, line)) {
         stringstream ss(line);
-        string name, power_s, type_s;
+        string name, t1, t2, pvStr, atkName, atkPowStr;
         getline(ss, name, ',');
-        getline(ss, power_s, ',');
-        getline(ss, type_s, ',');
-        int power = stoi(power_s);
-        auto it = types.find(type_s);
-        if (it != types.end())
-            attacks[name] = new Attack(name, power, it->second);
-    }
-    return attacks;
-}
+        getline(ss, t1,   ',');
+        getline(ss, t2,   ',');
+        getline(ss, pvStr,',');
+        getline(ss, atkName,',');
+        getline(ss, atkPowStr);
 
-map<string, Pokemon*> DataLoader::loadPokemons(const string& filename,
-                                               const map<string, Type*>& types,
-                                               const map<string, Attack*>& attacks) {
-    map<string, Pokemon*> pokedex;
-    ifstream in(filename);
-    string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
-        stringstream ss(line);
-        string name, hp_s, types_s, attacks_s;
-        getline(ss, name, ',');
-        getline(ss, hp_s, ',');
-        getline(ss, types_s, ',');
-        getline(ss, attacks_s, ',');
-        int hp = stoi(hp_s);
+        int pv    = stoi(pvStr);
+        int powAt = stoi(atkPowStr);
 
-        vector<Type*> tv;
-        string tname;
-        stringstream st(types_s);
-        while (getline(st, tname, ';')) {
-            auto it = types.find(tname);
-            if (it != types.end())
-                tv.push_back(it->second);
+        // --- Types ---
+        vector<Type*> vtypes;
+        if (!t1.empty()) {
+          if (!types.count(t1)) types[t1] = new Type(t1);
+          vtypes.push_back(types[t1]);
+        }
+        if (!t2.empty()) {
+          if (!types.count(t2)) types[t2] = new Type(t2);
+          vtypes.push_back(types[t2]);
         }
 
-        vector<Attack*> av;
-        string aname;
-        stringstream sa(attacks_s);
-        while (getline(sa, aname, ';')) {
-            auto it2 = attacks.find(aname);
-            if (it2 != attacks.end())
-                av.push_back(it2->second);
+        // --- Attaque unique (on stocke une seule attaque par Pokémon pour l'instant) ---
+        if (!attacks.count(atkName)) {
+          // on associe l'attaque à son type principal
+          attacks[atkName] = new Attack(atkName, powAt, types[t1]);
         }
+        vector<Attack*> vatk = { attacks[atkName] };
 
-        pokedex[name] = new Pokemon(name, hp, tv, av);
+        pokedex[name] = new Pokemon(name, pv, vtypes, vatk);
     }
     return pokedex;
 }
 
 Joueur* DataLoader::loadPlayer(const string& filename,
-                               const map<string, Pokemon*>& pokedex) {
-    ifstream in(filename);
-    string line;
-    if (!getline(in, line)) return nullptr;
+                               const map<string,Pokemon*>& pokedex) {
+    ifstream file(filename);
+    if (!file) {
+      cerr << "Erreur: impossible d'ouvrir " << filename << "\n";
+      return nullptr;
+    }
+    string line, header;
+    getline(file, header);
+    if (!getline(file, line)) return nullptr;
 
     stringstream ss(line);
-    string tmp;
-    getline(ss, tmp, ','); // on skip le nom "joueur"
-    string pname;
+    string name, pokeName;
     vector<Pokemon*> team;
-    while (getline(ss, pname, ',')) {
-        auto it = pokedex.find(pname);
-        if (it != pokedex.end())
-            team.push_back(it->second);
+    getline(ss, name, ',');
+    while (getline(ss, pokeName, ',')) {
+      if (pokedex.count(pokeName))
+        team.push_back(pokedex.at(pokeName));
     }
-    return new Joueur(tmp, team);
+    return new Joueur(name, team);
 }
 
 vector<LeaderGym*> DataLoader::loadLeaders(const string& filename,
-                                           const map<string, Pokemon*>& pokedex) {
-    vector<LeaderGym*> out;
-    ifstream in(filename);
-    string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
-        stringstream ss(line);
-        string name, gymid_s, badge;
-        getline(ss, name, ',');
-        getline(ss, gymid_s, ',');
-        getline(ss, badge, ',');
-        int gymId = stoi(gymid_s);
-
-        vector<Pokemon*> team;
-        string pname;
-        while (getline(ss, pname, ',')) {
-            auto it = pokedex.find(pname);
-            if (it != pokedex.end())
-                team.push_back(it->second);
-        }
-        out.push_back(new LeaderGym(name, team, gymId, badge));
+                                           const map<string,Pokemon*>& pokedex) {
+    ifstream file(filename);
+    if (!file) {
+      cerr << "Erreur: impossible d'ouvrir " << filename << "\n";
+      return {};
     }
-    return out;
+    string line, header;
+    getline(file, header);
+    vector<LeaderGym*> result;
+    int gymId = 1;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string name, gymName, badge;
+        getline(ss, name, ',');
+        getline(ss, gymName, ',');
+        getline(ss, badge, ',');
+        vector<Pokemon*> team;
+        string pokeName;
+        while (getline(ss, pokeName, ',')) {
+          if (pokedex.count(pokeName))
+            team.push_back(pokedex.at(pokeName));
+        }
+        result.push_back(new LeaderGym(name, team, gymId++, badge));
+    }
+    return result;
 }
 
 vector<MaitrePokemon*> DataLoader::loadMasters(const string& filename,
-                                               const map<string, Pokemon*>& pokedex) {
-    vector<MaitrePokemon*> out;
-    ifstream in(filename);
-    string line;
-    while (getline(in, line)) {
-        if (line.empty()) continue;
+                                               const map<string,Pokemon*>& pokedex) {
+    ifstream file(filename);
+    if (!file) {
+      cerr << "Erreur: impossible d'ouvrir " << filename << "\n";
+      return {};
+    }
+    string line, header;
+    getline(file, header);
+    vector<MaitrePokemon*> result;
+
+    while (getline(file, line)) {
         stringstream ss(line);
         string name;
         getline(ss, name, ',');
         vector<Pokemon*> team;
-        string pname;
-        while (getline(ss, pname, ',')) {
-            auto it = pokedex.find(pname);
-            if (it != pokedex.end())
-                team.push_back(it->second);
+        string pokeName;
+        while (getline(ss, pokeName, ',')) {
+          if (pokedex.count(pokeName))
+            team.push_back(pokedex.at(pokeName));
         }
-        out.push_back(new MaitrePokemon(name, team));
+        result.push_back(new MaitrePokemon(name, team));
     }
-    return out;
+    return result;
 }
 
