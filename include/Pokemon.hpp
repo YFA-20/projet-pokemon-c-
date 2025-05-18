@@ -33,6 +33,13 @@ public:
   /// @return pointeur vers l’attaque à l’index (lance std::out_of_range si invalide)
   Attack* getAttaque(size_t index) const;
 
+  // ——————————————————————————————————————————
+  // Getters nécessaires pour le menu Joueur
+  /// @return la liste des types de ce Pokémon
+  const std::vector<Type*>&   getTypes()   const { return types_; }
+  /// @return la liste des attaques de ce Pokémon
+  const std::vector<Attack*>& getAttaques() const { return attaques_; }
+
 private:
   std::string            nom_;
   int                    pv_;
