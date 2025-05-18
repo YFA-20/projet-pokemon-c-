@@ -30,20 +30,21 @@ public:
   /// @return nombre d’attaques disponibles
   size_t getNbAttaques() const;
 
-  /// @return pointeur vers l’attaque à l’index (lance std::out_of_range si invalide)
+  /// @return pointeur vers l’attaque à l’index
   Attack* getAttaque(size_t index) const;
 
-  // ——————————————————————————————————————————
-  // Getters nécessaires pour le menu Joueur
+  // ─── Getters pour le menu Joueur ────────────────────────────────
+
   /// @return la liste des types de ce Pokémon
-  const std::vector<Type*>&   getTypes()   const { return types_; }
+  const std::vector<Type*>& getTypes() const { return types_; }
+
   /// @return la liste des attaques de ce Pokémon
   const std::vector<Attack*>& getAttaques() const { return attaques_; }
 
 private:
-  std::string            nom_;
-  int                    pv_;
-  std::vector<Type*>     types_;    // 1..2
-  std::vector<Attack*>   attaques_; // 1..4
+  std::string              nom_;
+  int                      pv_;
+  std::vector<Type*>       types_;    // 1..2
+  std::vector<Attack*>     attaques_; // 1..4
 };
 
