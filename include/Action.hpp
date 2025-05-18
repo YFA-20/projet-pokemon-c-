@@ -1,34 +1,40 @@
 #pragma once
-#include <string>
-class Attack;
+
+// Forward declarations pour casser la circularité
 class Pokemon;
+class Attack;
 
-/// Type d’action possible
-enum class ActionType { ATTAQUE, CHANGEMENT };
-
-/// Contient soit une attaque, soit un nouveau Pokémon
+/// Représente le choix d’un dresseur : attaque ou changement de Pokémon
 class Action {
 public:
-  ActionType    type;
-  Attack*       attaqueChoisie;   // valide si type==ATTAQUE
-  Pokemon*      nouveauPokemon;    // valide si type==CHANGEMENT
+    enum Kind { ATTAQUE, CHANGEMENT };
 
-  /// Crée une Action ATTAQUE
-  static Action makeAttaque(Attack* a) {
-    return Action{ ActionType::ATTAQUE, a, nullptr };
-  }
+    // Fabriques
+    static Action makeAttaque(Attack* a) {
+        Action x;
+        x.kind_            = ATTAQUE;
+        x.attaqueChoisie_  = a;
+        return x;
+    }
+    static Action makeChangement(Pokemon* p) {
+        Action x;
+        x.kind_           = CHANGEMENT;
+        x.pokemonSuivant_ = p;
+        return x;
+    }
 
-  /// Crée une Action CHANGEMENT
-  static Action makeChangement(Pokemon* p) {
-    return Action{ ActionType::CHANGEMENT, nullptr, p };
-  }
+    // Query
+    Kind    kind()           const { return kind_; }
+    bool    estAttaque()     const { return kind_ == ATTAQUE; }
+    bool    estChangement()  const { return kind_ == CHANGEMENT; }
 
-  bool estAttaque()   const { return type == ActionType::ATTAQUE; }
-  bool estChangement()const { return type == ActionType::CHANGEMENT; }
+    // Accesseurs
+    Attack* attaqueChoisie() const { return attaqueChoisie_; }
+    Pokemon* pokemonSuivant() const { return pokemonSuivant_; }
 
 private:
-  // constructeur privé : on force l’usage des fabriques statiques
-  Action(ActionType t, Attack* a, Pokemon* p)
-    : type(t), attaqueChoisie(a), nouveauPokemon(p) {}
+    Kind      kind_;
+    Attack*   attaqueChoisie_ = nullptr;
+    Pokemon*  pokemonSuivant_ = nullptr;
 };
 

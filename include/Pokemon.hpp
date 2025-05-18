@@ -2,49 +2,52 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include "Interagir.hpp"  
 #include "Type.hpp"
 #include "Attack.hpp"
 
-/// Représente un Pokémon avec types et attaques
-class Pokemon {
+/// Représente un Pokémon avec types, attaques et interaction
+class Pokemon : public Interagir {
 public:
-  /// Constructeur : nom, PV initiaux, 1..2 types et 1..4 attaques
-  Pokemon(const std::string& nom,
-          int pv,
-          const std::vector<Type*>& types,
-          const std::vector<Attack*>& attaques);
+    /// @param nom     nom du Pokémon
+    /// @param pv      points de vie initiaux
+    /// @param types   vecteur de 1 ou 2 Type*
+    /// @param attaques vecteur de 1 à 4 Attack*
+    Pokemon(const std::string& nom,
+            int pv,
+            const std::vector<Type*>& types,
+            const std::vector<Attack*>& attaques);
 
-  /// Lancer la 1ʳᵉ attaque contre la cible
-  void attaquer(Pokemon& cible);
+    /// attaque simple avec l’attaque*(lance les dégâts)
+    void attaquer(Pokemon& cible);
 
-  /// Réduire les PV et afficher le résultat
-  void recevoirDegats(int montant);
+    /// nouvelle surcharge : attaque avec choix d’Attack*
+    void attaquer(Pokemon& cible, Attack* atk);
 
-  /// @return true si PV <= 0
-  bool estKO() const;
+    void recevoirDegats(int montant);
+    bool estKO() const;
 
-  /// Accesseurs
-  const std::string& getNom() const;
-  int                 getPV()  const;
+    // Accesseurs
+    const std::string& getNom() const;
+    int                getPV()  const;
+    size_t             getNbAttaques() const;
+    Attack*            getAttaque(size_t idx) const;
 
-  /// @return nombre d’attaques disponibles
-  size_t getNbAttaques() const;
+    /// Interaction : Pokémon réagit quand on lui parle
+    void interagir() override {
+        std::cout << getNom()
+                  << " te regarde et fronce les sourcils curieusement.\n";
+    }
 
-  /// @return pointeur vers l’attaque à l’index
-  Attack* getAttaque(size_t index) const;
-
-  // ─── Getters pour le menu Joueur ────────────────────────────────
-
-  /// @return la liste des types de ce Pokémon
-  const std::vector<Type*>& getTypes() const { return types_; }
-
-  /// @return la liste des attaques de ce Pokémon
-  const std::vector<Attack*>& getAttaques() const { return attaques_; }
+    // Getters utiles pour le menu
+    const std::vector<Type*>&   getTypes()    const { return types_; }
+    const std::vector<Attack*>& getAttaques() const { return attaques_; }
 
 private:
-  std::string              nom_;
-  int                      pv_;
-  std::vector<Type*>       types_;    // 1..2
-  std::vector<Attack*>     attaques_; // 1..4
+    std::string            nom_;
+    int                    pv_;
+    std::vector<Type*>     types_;
+    std::vector<Attack*>   attaques_;
 };
 

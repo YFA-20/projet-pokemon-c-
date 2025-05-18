@@ -1,10 +1,10 @@
 #pragma once
-#include "Action.hpp"
 
-/// Interface pour toute entité capable de choisir une Action
+/// Interface pour toute entité avec laquelle on peut interagir
 class Interagir {
 public:
-  virtual ~Interagir() = default;
-  virtual Action choisirAction() = 0;
+    virtual ~Interagir() = default;
+    virtual void interagir() = 0;
 };
+
 

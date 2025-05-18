@@ -1,4 +1,5 @@
 #include "LeaderGym.hpp"
+#include "Pokemon.hpp"
 
 LeaderGym::LeaderGym(const std::string& nom,
                      const std::vector<Pokemon*>& equipe,

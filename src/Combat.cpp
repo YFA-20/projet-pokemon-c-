@@ -1,8 +1,12 @@
-#include "Combat.hpp"
 #include <iostream>
+#include <Combat.hpp>
+#include "Joueur.hpp"
+#include "Pokemon.hpp"
+#include "Action.hpp"
+
 
 Combat::Combat(Dresseur* d1, Dresseur* d2)
-    : d1_(d1), d2_(d2), tour_(0)
+  : d1_(d1), d2_(d2), tour_(1)
 {}
 
 bool Combat::estTermine() const {
@@ -10,43 +14,41 @@ bool Combat::estTermine() const {
 }
 
 void Combat::tourSuivant() {
-    ++tour_;
-    std::cout << "\n--- Tour " << tour_ << " ---\n";
-
-    // Chaque dresseur choisit son action
     Action a1 = d1_->choisirAction();
-    Action a2 = d2_->choisirAction();
-
-    // Récupération des Pokémons actifs
-    Pokemon* p1 = d1_->getActif();
-    Pokemon* p2 = d2_->getActif();
-
-    // Exécution de la première action
     if (a1.estAttaque()) {
-        p1->attaquer(*p2);
+        d1_->getActif()->attaquer(*d2_->getActif(), a1.attaqueChoisie());
     } else {
-        int idx = d1_->indexActif(a1.nouveauPokemon);
-        d1_->changerPokemon(idx);
+        d1_->changerPokemon(a1.pokemonSuivant());
     }
-
-    // Si le combat est fini après la première action, on stoppe
     if (estTermine()) return;
 
-    // Exécution de la seconde action
+    Action a2 = d2_->choisirAction();
     if (a2.estAttaque()) {
-        p2->attaquer(*p1);
+        d2_->getActif()->attaquer(*d1_->getActif(), a2.attaqueChoisie());
     } else {
-        int idx = d2_->indexActif(a2.nouveauPokemon);
-        d2_->changerPokemon(idx);
+        d2_->changerPokemon(a2.pokemonSuivant());
     }
+
+    ++tour_;
 }
 
 void Combat::demarrer() {
-    std::cout << "Début du combat entre "
+    std::cout << "\nDébut du combat entre "
               << d1_->getNom() << " et " << d2_->getNom() << " !\n";
+
     while (!estTermine()) {
+        std::cout << "\n--- Tour " << tour_ << " ---\n";
         tourSuivant();
     }
-    std::cout << "\nFin du combat.\n";
+
+    Dresseur* gagnant = d1_->aPokemonDisponible() ? d1_ : d2_;
+    Dresseur* perdant  = (gagnant == d1_) ? d2_ : d1_;
+
+    std::cout << "\nFin du combat. Vainqueur : "
+              << gagnant->getNom() << " !\n";
+
+    if (auto* j = dynamic_cast<Joueur*>(gagnant)) {
+        j->addDefeatedTrainer(perdant);
+    }
 }
 

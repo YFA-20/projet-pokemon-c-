@@ -2,41 +2,38 @@
 
 #include <string>
 #include <vector>
-#include "Pokemon.hpp"
-#include "Interagir.hpp"
+#include "Interagir.hpp"  // pour hériter
+#include "Action.hpp"
+class Pokemon;           // forward declare
 
-/// Un dresseur possède un nom, une équipe de Pokémons et choisit des actions.
+/// Classe de base pour tous les dresseurs (joueur, leader, maître)
 class Dresseur : public Interagir {
 public:
-    /// Constructeur
-    /// @param nom    : nom du dresseur
-    /// @param equipe : liste de 1..6 Pokémons
+    /// Constructeur : nom et équipe initiale
     Dresseur(const std::string& nom,
              const std::vector<Pokemon*>& equipe);
 
-    /// @return le nom du dresseur
+    virtual ~Dresseur();
+
+    /// @return action choisie (pure virtual)
+    virtual Action choisirAction() = 0;
+
+    /// Getters
     const std::string& getNom() const;
+    Pokemon*           getActif() const;
 
-    /// @return le Pokémon actif
-    Pokemon* getActif() const;
-
-    /// @return l’index de p dans l’équipe, ou -1 si non trouvé
-    int indexActif(Pokemon* p) const;
-
-    /// @return true s’il reste au moins un Pokémon non KO
+    /// @return true s’il reste un Pokémon non-KO
     bool aPokemonDisponible() const;
 
-    /// Change le Pokémon actif vers l’index idx (0..size-1)
-    void changerPokemon(int idx);
+    /// Change de Pokémon actif si possible
+    void changerPokemon(Pokemon* nouveau);
 
-    /// Choisit une action : attaque si possible, sinon switch
-    Action choisirAction() override;
+    /// Interaction simple (par défaut)
+    void interagir() override;
 
 protected:
-    std::vector<Pokemon*> equipe_;  // 1..6
-    Pokemon*              actif_;   // toujours un des membres de equipe_
-
-private:
-    std::string nom_;
+    std::string            nom_;
+    std::vector<Pokemon*>  equipe_;
+    Pokemon*               actif_;
 };
 

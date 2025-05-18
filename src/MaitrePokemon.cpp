@@ -1,4 +1,5 @@
 #include "MaitrePokemon.hpp"
+#include "Pokemon.hpp"
 
 MaitrePokemon::MaitrePokemon(const std::string& nom,
                              const std::vector<Pokemon*>& equipe)
