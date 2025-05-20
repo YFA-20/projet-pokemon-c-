@@ -11,7 +11,7 @@ LeaderGym::LeaderGym(const std::string& nom,
 {}
 
 Action LeaderGym::choisirAction() {
-    // IA très simple : toujours première attaque
+    // Machine très simple : toujours première attaque
     Pokemon* actif = getActif();
     return Action::makeAttaque(actif->getAttaque(0));
 }
