@@ -1,6 +1,6 @@
 #include "Dresseur.hpp"
-#include <algorithm>   // std::find
-#include <iostream>    // std::cout
+#include <algorithm>   
+#include <iostream>    
 
 Dresseur::Dresseur(const std::string& nom,
                    const std::vector<Pokemon*>& equipe)
