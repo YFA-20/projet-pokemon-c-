@@ -12,8 +12,6 @@ int main() {
     auto leaders = DataLoader::loadLeaders ("fichiers_csv/leaders.csv",  pokedex);
     auto masters = DataLoader::loadMasters ("fichiers_csv/maitres.csv",  pokedex);
 
-    // vérifications omises pour la concision…
-
     // ici on délègue tout le menu principal
     lancerMenuPrincipal(joueur, leaders, masters);
 
