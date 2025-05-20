@@ -2,7 +2,7 @@
 #include "Dresseur.hpp"
 #include <string>
 
-/// Un leader de gym basique : IA qui choisit toujours la 1ʳᵉ attaque
+/// Un leader de gym basique : Machine qui choisit toujours la 1ʳᵉ attaque
 class LeaderGym : public Dresseur {
 public:
     LeaderGym(const std::string& nom,
