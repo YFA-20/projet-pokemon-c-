@@ -31,9 +31,12 @@ TARGET  := pokemon-simulator
 # Fichiers de test
 # =============================
 SRC_TEST := $(TEST_DIR)/Pokemon.test.cpp \
+            $(TEST_DIR)/Combat.test.cpp  \
             $(SRC_DIR)/Pokemon.cpp       \
             $(SRC_DIR)/Attack.cpp        \
-            $(SRC_DIR)/Type.cpp
+            $(SRC_DIR)/Type.cpp          \
+            $(SRC_DIR)/Dresseur.cpp      \
+            $(SRC_DIR)/Combat.cpp
 
 TEST_BIN := runTests
 
